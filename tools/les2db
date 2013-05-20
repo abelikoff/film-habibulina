@@ -118,7 +118,8 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         # split into clean tokens
 
         tokens = set(strip_punctuation(phrase.lower()).split())
-        tokens = [ t for t in tokens if not re.match(r'^\s*$', t) ]
+        tokens = [ t for t in tokens if (not re.match(r'^\s*$', t)
+                                         and len(t) > 1) ]
 
         if len(tokens) == 0:
             continue
