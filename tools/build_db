@@ -1,0 +1,12 @@
+#!/bin/ksh
+
+db=../data/habib.db
+
+rm -f $db
+sqlite3 $db < ../data/schema_sqlite.sql
+
+cat ../data/urls.in | while read url; do
+    file=${url##*/}
+    print $file
+    ./les2db $db ../data/$file $url
+done

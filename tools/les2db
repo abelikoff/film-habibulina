@@ -27,26 +27,11 @@ def strip_punctuation(text):
     return ''.join(replace_punct(x) for x in text)
 
 
-def redirect_output(file):
-    f = os.open(options.log_file, 1, 0644)
-    os.close(1)
-
-    if os.dup(f) != 1:
-        sys.stderr.write("ERROR: failed to dup STDOUT\n")
-
-    os.close(2)
-
-    if os.dup(f) != 2:
-        sys.stderr.write("ERROR: failed to dup STDERR\n")
-
-
-
 usage_string = """Usage:  %prog [options]  <db_file>  <play_file>  <url>
 
 %prog takes the play file in HTML format, parses it and saves it
 into a DB.
 """
-
 
 prog = os.path.basename(sys.argv[0])
 program_version = "1.0"
@@ -120,6 +105,8 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         else:
             phrase = line
 
+        # clean up
+
         phrase = re.sub(r'\<\/?\S+?\>', '', phrase)
         phrase = re.sub(r'\&nbsp;', '', phrase)
         phrase = re.sub(r'\<font[^\>]*\>', '', phrase)
@@ -127,6 +114,8 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
 
         if re.match('^\s*$', phrase):
             continue
+
+        # split into clean tokens
 
         tokens = set(strip_punctuation(phrase.lower()).split())
         tokens = [ t for t in tokens if not re.match(r'^\s*$', t) ]
