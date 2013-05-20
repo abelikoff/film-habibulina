@@ -1,0 +1,143 @@
+#!/usr/bin/env python
+
+# parse HTML-formatted play into a DB
+
+
+import codecs
+import unicodedata
+import re
+import os
+import os.path
+import logging
+import sys
+from optparse import OptionParser
+import sqlite3
+
+
+def replace_punct(x):
+    punctutation_cats = set(['Pc', 'Pd', 'Ps', 'Pe', 'Pi', 'Pf', 'Po'])
+
+    if unicodedata.category(x) in punctutation_cats:
+        return ' '
+
+    return x
+
+
+def strip_punctuation(text):
+    return ''.join(replace_punct(x) for x in text)
+
+
+def redirect_output(file):
+    f = os.open(options.log_file, 1, 0644)
+    os.close(1)
+
+    if os.dup(f) != 1:
+        sys.stderr.write("ERROR: failed to dup STDOUT\n")
+
+    os.close(2)
+
+    if os.dup(f) != 2:
+        sys.stderr.write("ERROR: failed to dup STDERR\n")
+
+
+
+usage_string = """Usage:  %prog [options]  <db_file>  <play_file>  <url>
+
+%prog takes the play file in HTML format, parses it and saves it
+into a DB.
+"""
+
+
+prog = os.path.basename(sys.argv[0])
+program_version = "1.0"
+version_string = "%%prog  %s" % program_version
+
+logging.basicConfig(format = "%(asctime)s  " + prog + 
+                    ": %(levelname)s: %(message)s")
+
+
+# parse command-line options
+
+parser = OptionParser(usage = usage_string,
+                      version = version_string)
+parser.add_option("-v", "--verbose", help = "verbose operation",
+                  action = "store_true", dest = "verbose_mode")
+
+(options, args) = parser.parse_args()
+
+if options.verbose_mode:
+    logging.getLogger().setLevel(logging.DEBUG)
+else:
+    logging.getLogger().setLevel(logging.INFO)
+
+if len(args) != 3:
+    parser.print_help()
+    sys.exit()
+
+db_file, in_file, url = args
+
+conn = sqlite3.connect(db_file)
+crs = conn.cursor()
+
+with codecs.open(in_file, encoding = 'cp1251') as fin:
+    title = None
+    in_body = False
+    play_id = None
+
+    for line in fin:
+        speaker = None
+
+        # extract the title
+
+        m = re.match(r'^\<h2\>(.*?)\.?(\<(\/h2|br)\>)\s*', line)
+
+        if not title and m:
+            title = m.group(1)
+            crs.execute('INSERT INTO plays (title, url) VALUES (?, ?)',
+                        (title, url))
+            play_id = crs.lastrowid
+            continue
+
+        # narrow to the body
+
+        if not in_body and title and re.match('^\<center\>', line):
+            in_body = True
+
+        if in_body and re.match('^\<hr', line):
+            in_body = False
+
+        if not in_body or re.match('^\s*$', line):
+            continue
+
+
+        # extract the speaker and the phrase (for future formatting)
+
+        m = re.match(r'^\<b\>(.*?)\.?\<\/b\>\&nbsp\;(.*)', line)
+
+        if m:
+            speaker = m.group(1)
+            phrase = m.group(2)
+        else:
+            phrase = line
+
+        phrase = re.sub(r'\<\/?\S+?\>', '', phrase)
+        phrase = re.sub(r'\&nbsp;', '', phrase)
+        phrase = re.sub(r'\<font[^\>]*\>', '', phrase)
+        phrase = re.sub(r'\s+$', '', phrase)
+
+        if re.match('^\s*$', phrase):
+            continue
+
+        tokens = set(strip_punctuation(phrase.lower()).split())
+        tokens = [ t for t in tokens if not re.match(r'^\s*$', t) ]
+
+        if len(tokens) == 0:
+            continue
+
+        crs.execute("""
+INSERT INTO quotes (play_id, speaker, phrase, tokens) VALUES (?,?,?,?)""",
+                    (play_id, speaker, phrase, " ".join(tokens)))
+
+conn.commit()
+conn.close()
+sys.exit()
