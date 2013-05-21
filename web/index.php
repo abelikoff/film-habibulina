@@ -4,31 +4,97 @@
 define('DB_FILE', '/tmp/habib.db');
 
 
-// calculate Levenshtein distance between words w1 and w2
-
-function zlevenshtein($w1, $w2)
+function show_matches($query)
 {
-    $l1 = len(w1);
-    $l2 = len(w2);
-
-    if ($l1 == 0)
-        return $l2;
-
-    if ($l2 == 0)
-        return $l1;
-
-
-    // test if last characters of the strings match
-
-    $cost = ($w1[l1 - 1] == $w2[l2 - 1]) ? 0 : 1;
-
+    $show_scores = TRUE;        // set to TRUE to display scores
     
-    // return minimum of delete char from w1, delete char from w2,
-    // and delete char from both
 
-    return min(levenshtein(substr($w1, 0, -1), $w2) + 1,
-               levenshtein($w1, substr($w2, 0, -1)) + 1,
-               levenshtein(substr($w1, 0, -1), substr($w2, 0, -1)) + $cost);
+    // open the database
+
+    if (!file_exists(DB_FILE)) {
+        printf("ERROR: no database");
+        exit(1);
+    }
+
+    if (!($db = new SQLite3(DB_FILE, SQLITE3_OPEN_READONLY))) {
+        printf("ERROR: cannot open database");
+        exit(1);
+    }
+
+
+    // load tokens
+    
+    //$query = "пизділи тьолок";
+    //$query = "дослідники калу";
+    
+    $phrases = array();
+    $st = @$db->query("SELECT quote_id, tokens FROM quotes");
+
+    while ($row = $st->fetchArray()) {
+        array_push($phrases, array('quote_id' => $row[0], 'tokens' => $row[1],
+                                   'score' => get_similarity_score($row[1], $query)));
+    }
+
+
+    // collect top 5 matches
+
+    usort($phrases, 'cmp');
+    $quote_ids = array();
+    $scores = array();
+    $ii = 0;
+    
+    foreach ($phrases as $key => $value) {
+        if ($ii > 5 || $value['score'] < 0.05)
+            break;
+        
+        array_push($quote_ids, $value['quote_id']);
+        $scores[$value['quote_id']] = $value['score'];
+        $ii++;
+    }
+
+    if (count($quote_ids) == 0) {
+        print "<b>NO MATCHES</b>"; /* FIXME */
+        return;
+    }
+
+    print('
+    <div id="result-area">
+');
+
+
+    $st = $db->query("
+SELECT quote_id, title, url, speaker, phrase
+    FROM plays AS p, quotes AS q
+    WHERE q.play_id == p.play_id
+        AND q.quote_id IN (" . implode(", ", $quote_ids) . ")");
+
+    $results = array();
+    
+    while ($row = $st->fetchArray()) {
+        $results[$row['quote_id']] = $row;
+    }
+
+    foreach ($quote_ids as $quote_id) {
+        $row = $results[$quote_id];
+        printf('
+      <div class="result-entry">
+        <a class="source-link" href="%s">%s</a>
+        <p class="quote"><span class="speaker">%s</span>
+          %s
+        </p>
+', $row['url'], $row['title'], $row['speaker'], $row['phrase']);
+
+        if ($show_scores)
+            printf('<span class="score">%.5f</span>', $scores[$quote_id]);
+            
+        printf('
+      </div>
+');
+    }
+
+    print('
+    </div>
+');
 }
 
 
@@ -79,6 +145,14 @@ function build_comparator($key)
 }
 
 
+// parse input
+
+$query = "";
+
+if (isset($_REQUEST['query']))
+    $query = trim($_REQUEST['query']);
+
+
 printf('
 <!DOCTYPE html>
 <html>
@@ -92,16 +166,6 @@ printf('
     <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
-    <link rel="stylesheet" href="/resources/demos/style.css" />
-    <script>
-      $(function() {
-      $( "input[type=submit], button" )
-      .button()
-      .click(function( event ) {
-      event.preventDefault();
-      });
-      });
-    </script>
     
   </head>
   <body>
@@ -117,13 +181,24 @@ printf('
         <h2>Цитатник Леся Подерв\'янського</h2>
       </div>
       <div>
-        <form>
-          <input name="query" />
+        <form action="">
+          <input type="text" name="query" value="%s" />
           <input type="submit" value="GO!">
         </form>
       </div>
-    </div>
-    
+    </div>    
+', htmlspecialchars($query));
+
+
+print "<pre>";
+var_dump($_SERVER);
+print "</pre>";
+
+if ($query != "") {
+    show_matches($query);
+}
+else {
+    printf('
     <div id="hint-area">
       <div class="hint-title">Example queries</div>
       
@@ -136,86 +211,10 @@ printf('
       </div>
       
     </div>
-    
-    <div id="result-area">
 ');
 
 
-// open the database
-
-if (!file_exists(DB_FILE)) {
-    printf("ERROR: no database");
-    exit(1);
 }
-
-if (!($db = new SQLite3(DB_FILE, SQLITE3_OPEN_READONLY))) {
-    printf("ERROR: cannot open database");
-    exit(1);
-}
-
-
-// load tokens
-
-$query = "пизділи тьолок";
-$query = "дослідники калу";
-
-$phrases = array();
-
-//$st = @$db->query("SELECT quote_id, tokens FROM quotes where play_id == 12");
-$st = @$db->query("SELECT quote_id, tokens FROM quotes");
-
-while ($row = $st->fetchArray()) {
-    array_push($phrases, array('quote_id' => $row[0], 'tokens' => $row[1],
-                               'score' => get_similarity_score($row[1], $query)));
-}
-
-
-// collect top 5 matches
-
-usort($phrases, 'cmp');
-
-$quote_ids = array();
-$ii = 0;
-
-foreach ($phrases as $key => $value) {
-    if ($ii > 5 || $value['score'] < 0.05)
-        break;
-
-    array_push($quote_ids, $value['quote_id']);
-    $ii++;
-}
-
-if (count($quote_ids) == 0) {
-    print "<b>NO MATCHES</b>";
-    exit(1);
-}
-
-
-$st = $db->query("
-SELECT quote_id, title, url, speaker, phrase
-    FROM plays AS p, quotes AS q
-    WHERE q.play_id == p.play_id
-        AND q.quote_id IN (" . implode(", ", $quote_ids) . ")");
-
-$results = array();
-
-while ($row = $st->fetchArray()) {
-    $results[$row['quote_id']] = $row;
-}
-
-foreach ($quote_ids as $quote_id) {
-    $row = $results[$quote_id];
-    printf('
-      <div class="result-entry">
-        <a class="source-link" href="%s">%s</a>
-        <p class="quote"><span class="speaker">%s</span>
-          %s
-        </p>
-      </div>
-', $row['url'], $row['title'], $row['speaker'], $row['phrase']);
-}
-
-
 
 printf('
       
