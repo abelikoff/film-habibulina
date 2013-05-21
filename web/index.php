@@ -56,12 +56,16 @@ function get_similarity_score($phrase1, $phrase2)
 }
 
 
+function cmp($a, $b)
+{
+    return ($a['score'] < $b['score']) ? 1 : -1;
+}
+
+
 function build_comparator($key)
 {
     return function($a, $b) use ($key) {
         $score1 = $score2 = 0;        
-        //similar_text($a[1], $key, $score1);
-        //similar_text($b[1], $key, $score2);
         $score1 = get_similarity_score($a[1], $key);
         $score2 = get_similarity_score($b[1], $key);
         printf("a: %s<br>", $a[1]);
@@ -80,7 +84,7 @@ printf('
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Hello</title>
+    <title>Фільм Хабібуліна</title>
     <link rel="stylesheet" type="text/css" media="screen" href="css/master.css" />
     <!-- script type="text/javascript"
             src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script -->
@@ -109,8 +113,8 @@ printf('
     
     <div id="query-area">
       <div id="title-area">
-        <h1>Portfolio Test</h1>
-        <h2>Test your portfolio here</h2>
+        <h1>Фільм Хабібуліна</h1>
+        <h2>Цитатник Леся Подерв\'янського</h2>
       </div>
       <div>
         <form>
@@ -120,84 +124,21 @@ printf('
       </div>
     </div>
     
-    <div id="hint-area" hidden="no">
+    <div id="hint-area">
       <div class="hint-title">Example queries</div>
       
       <div class="hint">
-        <a class="hint-link" href="http://yahoo.com">Query 1</a>
+        <a class="hint-link" href="http://yahoo.com">От де екзистенція</a>
       </div>
       
       <div class="hint">
-        <a class="hint-link" href="http://yahoo.com">Query 2</a>
-      </div>
-      
-      <div class="hint">
-        <a class="hint-link" href="http://yahoo.com">Query 3</a>
+        <a class="hint-link" href="http://yahoo.com">дослідники калу</a>
       </div>
       
     </div>
     
     <div id="result-area">
-      <div class="result-entry">
-        <a class="source-link" href="http://yahoo.com">Portfolio 1</a>
-        <p class="quote"><span class="speaker">Lorem ipsum
-        dolor</span> sit amet, consectetur adipisicing elit, sed do
-        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-        enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
-      </div>
-      
-      <div class="result-entry">
-        <a class="source-link" href="http://yahoo.com">Portfolio 1</a>
-        <p class="quote"><span class="speaker">Lorem ipsum
-        dolor</span> sit amet, consectetur adipisicing elit, sed do
-        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-        enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
-      </div>
-      
-      <div class="result-entry">
-        <a class="source-link" href="http://yahoo.com">Portfolio 1</a>
-        <p class="quote"><span class="speaker">Lorem ipsum
-        dolor</span> sit amet, consectetur adipisicing elit, sed do
-        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-        enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
-      </div>
-      
-      <div class="result-entry">
-        <a class="source-link" href="http://yahoo.com">Portfolio 1</a>
-        <p class="quote"><span class="speaker">Lorem ipsum
-        dolor</span> sit amet, consectetur adipisicing elit, sed do
-        eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-        enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat.</p>
-      </div>
-      
-    </div>
 ');
-
-$s1 = "abcdef";
-$s2 = "abcxef";
-$s3 = "kazoo";
-
-print levenshtein($s1, $s2);
-print "<br>";
-print levenshtein($s1, $s3);
-print "<br>";
-$phrase1 = "To be or not to be";
-$phrase2 = "That is the question";
-
-print "Similarity<br>";
-print get_similarity_score($phrase1, $phrase2);
-print "<br>";
-print $phrase1;
-print "<br>";
-print $phrase2;
-similar_text($phrase1, $phrase1, $score);
-print "<br>";
-print $score;
-
 
 
 // open the database
@@ -215,29 +156,70 @@ if (!($db = new SQLite3(DB_FILE, SQLITE3_OPEN_READONLY))) {
 
 // load tokens
 
+$query = "пизділи тьолок";
+$query = "дослідники калу";
+
 $phrases = array();
 
-$st = @$db->query("SELECT quote_id, tokens FROM quotes where play_id == 12");
-$ii = 0;
+//$st = @$db->query("SELECT quote_id, tokens FROM quotes where play_id == 12");
+$st = @$db->query("SELECT quote_id, tokens FROM quotes");
 
 while ($row = $st->fetchArray()) {
-    array_push($phrases, array($row[0], $row[1], 0.0));
+    array_push($phrases, array('quote_id' => $row[0], 'tokens' => $row[1],
+                               'score' => get_similarity_score($row[1], $query)));
 }
 
-//print_r($phrases);
 
-print("<hr><br>");
+// collect top 5 matches
 
-usort($phrases, build_comparator("пизділи тьолок"));
+usort($phrases, 'cmp');
+
+$quote_ids = array();
+$ii = 0;
 
 foreach ($phrases as $key => $value) {
-    echo "$key: ";
-    print_r($value);
-    print("<br>");
+    if ($ii > 5 || $value['score'] < 0.05)
+        break;
+
+    array_push($quote_ids, $value['quote_id']);
+    $ii++;
 }
+
+if (count($quote_ids) == 0) {
+    print "<b>NO MATCHES</b>";
+    exit(1);
+}
+
+
+$st = $db->query("
+SELECT quote_id, title, url, speaker, phrase
+    FROM plays AS p, quotes AS q
+    WHERE q.play_id == p.play_id
+        AND q.quote_id IN (" . implode(", ", $quote_ids) . ")");
+
+$results = array();
+
+while ($row = $st->fetchArray()) {
+    $results[$row['quote_id']] = $row;
+}
+
+foreach ($quote_ids as $quote_id) {
+    $row = $results[$quote_id];
+    printf('
+      <div class="result-entry">
+        <a class="source-link" href="%s">%s</a>
+        <p class="quote"><span class="speaker">%s</span>
+          %s
+        </p>
+      </div>
+', $row['url'], $row['title'], $row['speaker'], $row['phrase']);
+}
+
 
 
 printf('
+      
+    </div>
     
     <div id="bottom">
       <div id="siteref"><a href="http://yahoo.com">About</a>
