@@ -1,0 +1,136 @@
+/*
+  Copyright (C) 2013, Alexander L. Belikoff  ( http://belikoff.net )
+    
+  This file is part of the project "Film Habibulina".
+  
+  Film Habibulina is free software: you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+  
+  Film Habibulina is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+  
+  You should have received a copy of the GNU General Public License
+  along with the project.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+body {
+}
+
+
+#top {
+}
+
+#query-area {
+    clear: bottom;
+    margin-left:auto;
+    margin-right:auto;
+    width:70%;
+    margin-top: 60px;
+    margin-bottom: 50px;
+}
+
+#title-area {
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+}
+
+#title-area h1 {
+    font-family: 'Roboto Slab', serif;
+    font-size: 60px;
+    margin-bottom: 0px;
+}
+
+#title-area h2 {
+    zfont-family: 'Roboto Slab', serif;
+    font-size: 18px;
+    margin-top: 10px;
+}
+
+#input-area {
+    margin-top: 30px;
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+}
+
+#input-area #zzquery-input {
+    background-color:#b0e0e6;
+    width: 50%;
+}
+
+#input-area .search-query {
+    width: 50%;
+}
+
+#results-area {
+    float: left;
+    clear: bottom;
+}
+
+.result-entry {
+    margin-bottom: 20px;
+}
+
+
+.result-entry .quote {
+    padding: 0px;
+    margin-top: 2px;
+    margin-right: 20%;
+}
+
+
+.result-entry .score {
+    font-size: small;
+    color: #339933;
+}
+
+
+#bottom {
+    background: Blue;
+    float: left;
+    clear: bottom;
+}
+
+
+.source-link a, a:visited, a:link, a:hover {
+    font-size: larger;
+    font-family: arial,sans-serif;
+    color: #12c;
+}
+
+
+.speaker {
+    font-weight: bold;
+}
+
+
+.quote {
+    font-size: small;
+    font-family: arial,sans-serif;
+}
+
+
+footer {
+    clear: both;
+}
+
+#siteref {
+    font-size: smaller;
+    position:relative;
+    float:right;
+    padding-right: 5px;
+    margin-top: -10px;
+}
+
+
+@media print {
+    .for-screen-only {
+        display: none;
+    }
+}
