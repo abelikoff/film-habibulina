@@ -125,6 +125,15 @@ footer {
     clear: both;
 }
 
+
+#credits {
+    font-size: smaller;
+    margin-top: -10px;
+    position:relative;
+    float: left;
+}
+
+
 #siteref {
     font-size: smaller;
     position:relative;

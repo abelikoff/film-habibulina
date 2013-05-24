@@ -182,11 +182,17 @@ printf('
     <link rel="stylesheet" type="text/css" href="master.css" />
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+      href="http://code.jquery.com/ui/1.9.1/themes/smoothness/jquery-ui.css" />
     <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
 
   </head>
   <body>
+
+    <div id="dialog" title="Credits">
+      <p>Текст пьес Леся взят с основного ресурса по творчеству Автора - сайта <a href="http://www.doslidy.kiev.ua/" target="_blank">"Цікаві Досліди."</a> Спасибо!</p>
+    </div>
 
     <div id="top" class="for-screen-only">
       <a href="https://github.com/abelikoff/film-habibulina"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
@@ -247,9 +253,27 @@ else {
 }
 
 printf('
-      
+
+    </div>
+
     <footer>
       <hr />
+      <a id="credits" href="javascript:show_credits();">Credits</a>
+
+      <script>
+        $("div#dialog").dialog ({
+          autoOpen : false
+        });
+
+        function show_credits() {
+          if ($("#dialog").dialog ("isOpen"))
+            alert ("Already open !");
+          else
+            $("#dialog").dialog ("open");
+        }
+      </script>
+
+
           <div id="siteref">Yet another contribution to humanity
         by <a href="http://belikoff.net">Alexander L. Belikoff</a>
       </div>
