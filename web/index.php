@@ -221,8 +221,14 @@ if ($query != "") {
     show_matches($query, $show_score);
 }
 else {
-    $examples = array('От де екзистенція', 'дослідники калу',
-                      'Шо за ностальгія, чого вам щас не хвата, тюрми?');
+    $examples = array('От де екзистенція',
+                      'дослідники калу',
+                      'Шо за ностальгія, чого вам щас не хвата, тюрми?',
+                      'я ето не люблю',
+                      'здоровенні тварюки',
+                      'Така робота, шо нема шо спиздить');
+
+    $selected = array_rand($examples, 3);
 
     printf('
     <div id="hint-area">
@@ -230,17 +236,17 @@ else {
       <ul>
 ');
       
-    foreach ($examples as $str) {
+    foreach ($selected as $str) {
         $url = sprintf("http://%s%s?%s",
                        $_SERVER['HTTP_HOST'],
                        $_SERVER['PHP_SELF'],
-                       http_build_query(array('query' => $str)));
+                       http_build_query(array('query' => $examples[$str])));
         printf('
         <li class="hint">
           <a class="hint-link" href="%s">%s</a>
         </li>
 
-', $url, $str);
+', $url, $examples[$str]);
     }
     
     printf('
