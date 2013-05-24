@@ -194,7 +194,7 @@ printf('
 
     <div id="query-area">
       <div id="title-area">
-        <h1>Фільм&nbsp;Хабібуліна</h1>
+        <a id="titleref" href="%s"><h1>Фільм&nbsp;Хабібуліна</h1></a>
         <h2>Цитатник&nbsp;Леся&nbsp;Подерв\'янського</h2>
       </div>
       <div id="input-area">
@@ -205,7 +205,9 @@ printf('
       </div>
     </div> <!-- query-area -->
 
-', htmlspecialchars($query));
+',
+       sprintf("http://%s%s", $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF']),
+       htmlspecialchars($query));
 
 
 if ($query != "") {

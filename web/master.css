@@ -105,6 +105,11 @@ body {
 }
 
 
+#titleref {
+    color: #333333;
+    text-decoration: none;
+}
+
 .speaker {
     font-weight: bold;
 }
