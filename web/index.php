@@ -58,7 +58,7 @@ function show_matches($query, $show_scores = FALSE)
 
     while ($row = $st->fetchArray()) {
         array_push($phrases, array('quote_id' => $row[0], 'tokens' => $row[1],
-                                   'score' => get_similarity_score($row[1], $query)));
+                                   'score' => get_similarity_score($query, $row[1])));
     }
 
 
@@ -70,12 +70,13 @@ function show_matches($query, $show_scores = FALSE)
     $ii = 0;
     
     foreach ($phrases as $key => $value) {
-        if ($ii > 5 || $value['score'] < 0.05)
+        $ii++;
+
+        if ($ii > 5 || $value['score'] < SCORE_CUTOFF)
             break;
         
         array_push($quote_ids, $value['quote_id']);
         $scores[$value['quote_id']] = $value['score'];
-        $ii++;
     }
 
     if (count($quote_ids) == 0) {
@@ -131,7 +132,6 @@ SELECT quote_id, title, url, speaker, phrase
 
 function get_similarity_score($phrase1, $phrase2)
 {
-    
     if (gettype($phrase1) == "string")
         $phrase1 = array_map('trim', explode(" ", $phrase1));
 
@@ -143,8 +143,10 @@ function get_similarity_score($phrase1, $phrase2)
     foreach ($phrase1 as $w1) {
         $s = 0;
 
-        foreach ($phrase2 as $w2)
-            $s = max(exp(-levenshtein(strtolower($w1), strtolower($w2))), $s);
+        foreach ($phrase2 as $w2) {
+            $scale = max(strlen($w1), strlen($w2));
+            $s = max(exp(- RATE * levenshtein(strtolower($w1), strtolower($w2)) / $scale), $s);
+        }
 
         $score += $s;
     }
