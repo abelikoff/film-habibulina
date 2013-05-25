@@ -191,10 +191,6 @@ printf('
   </head>
   <body>
 
-    <div id="dialog" title="Credits">
-      <p>Текст пьес Леся взят с основного ресурса по творчеству Автора - сайта <a href="http://www.doslidy.kiev.ua/" target="_blank">"Цікаві Досліди."</a> Спасибо!</p>
-    </div>
-
     <div id="top" class="for-screen-only">
       <a href="https://github.com/abelikoff/film-habibulina"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_gray_6d6d6d.png" alt="Fork me on GitHub" /></a>
     </div>
@@ -268,24 +264,12 @@ printf('
 
     <footer>
       <hr />
-      <a id="credits" href="javascript:show_credits();">Credits</a>
+      <div id="credits">Текст произведений Леся: 
+        <a href="http://www.doslidy.kiev.ua/" target="_blank">doslidy.kiev.ua</a>
+      </div>
 
-      <script>
-        $("div#dialog").dialog ({
-          autoOpen : false
-        });
-
-        function show_credits() {
-          if ($("#dialog").dialog ("isOpen"))
-            alert ("Already open !");
-          else
-            $("#dialog").dialog ("open");
-        }
-      </script>
-
-
-          <div id="siteref">Yet another contribution to humanity
-        by <a href="http://belikoff.net">Alexander L. Belikoff</a>
+      <div id="siteref">Yet another contribution to humanity
+        by <a href="http://belikoff.net" target="_blank">Alexander L. Belikoff</a>
       </div>
     </footer>
 
