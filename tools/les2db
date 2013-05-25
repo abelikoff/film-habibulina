@@ -115,11 +115,11 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
 
         # extract the speaker and the phrase (for future formatting)
 
-        m = re.match(r'^\<b\>(.*?)\.?\<\/b\>\&nbsp\;(.*)', line)
+        m = re.match(r'^\<b\>(.*?)\.?\<\/b\>\s*(\&nbsp\;)?(.*)', line)
 
         if m:
             speaker = m.group(1)
-            phrase = m.group(2)
+            phrase = m.group(3)
         else:
             phrase = line
 
@@ -133,6 +133,9 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         if re.match('^\s*$', phrase):
             continue
 
+        #if not speaker:
+        #    print phrase.encode('utf8')
+        
         # split into clean tokens
 
         tokens = set(strip_punctuation(phrase.lower()).split())

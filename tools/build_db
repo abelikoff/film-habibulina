@@ -19,12 +19,14 @@
 
 
 db=../data/habib.db
+root_url="http://www.doslidy.kiev.ua/stories"
 
 rm -f $db
 sqlite3 $db < ../data/schema_sqlite.sql
 
-cat ../data/urls.in | while read url; do
-    file=${url##*/}
-    print $file
+for file in ../data/*.htm; do
+    fname=$(basename $file)
+    url=$(printf "%s/%s" $root_url $fname)
+    print $fname
     ./les2db $db ../data/$file $url
 done
