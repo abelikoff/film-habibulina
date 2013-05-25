@@ -184,9 +184,10 @@ printf('
     <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
     <link rel="stylesheet" type="text/css"
       href="http://code.jquery.com/ui/1.9.1/themes/smoothness/jquery-ui.css" />
-    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet" />
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
-
+    <!--script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
+    <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet" / -->
   </head>
   <body>
 
@@ -224,8 +225,11 @@ else {
     $examples = array('От де екзистенція',
                       'дослідники калу',
                       'Шо за ностальгія, чого вам щас не хвата, тюрми?',
-                      'я ето не люблю',
-                      'здоровенні тварюки',
+                      'Я ето не люблю',
+                      'Шо мовчите, скуштували хуя?',
+                      'А ти хуй в бєлки видів?',
+                      'День колгоспника',
+                      'Йобане село',
                       'Така робота, шо нема шо спиздить');
 
     $selected = array_rand($examples, 3);
