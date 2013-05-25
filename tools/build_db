@@ -20,6 +20,7 @@
 
 db=../data/habib.db
 root_url="http://www.doslidy.kiev.ua/stories"
+default_url="http://www.doslidy.kiev.ua"
 
 rm -f $db
 sqlite3 $db < ../data/schema_sqlite.sql
@@ -28,4 +29,11 @@ for file in ../data/*.htm; do
     fname=$(basename $file)
     url=$(printf "%s/%s" $root_url $fname)
     ./les2db $db ../data/$file $url
+done
+
+# text files
+
+for file in ../data/*.txt; do
+    fname=$(basename $file)
+    ./les2db -t $db ../data/$file $default_url
 done

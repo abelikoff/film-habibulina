@@ -65,6 +65,8 @@ parser = OptionParser(usage = usage_string,
                       version = version_string)
 parser.add_option("-v", "--verbose", help = "verbose operation",
                   action = "store_true", dest = "verbose_mode")
+parser.add_option("-t", "--text-input", help = "Input is text",
+                  action = "store_true", dest = "text_mode")
 
 (options, args) = parser.parse_args()
 
@@ -84,20 +86,36 @@ crs = conn.cursor()
 num_speakers = 0
 num_records = 0
 
-with codecs.open(in_file, encoding = 'cp1251') as fin:
+if options.text_mode:
+    text_mode = True
+    enc = 'utf-8'
+else:
+    text_mode = False
+    enc = 'cp1251'
+
+with codecs.open(in_file, encoding = enc) as fin:
     title = None
     in_body = False
     play_id = None
 
     for line in fin:
+        line = line.rstrip('\n')
         speaker = None
+
+        if re.match('^\s*$', line):
+            continue
+
 
         # extract the title
 
         m = re.match(r'^\<h2\>(.*?)\.?(\<(\/h2|br)\>)\s*', line, re.IGNORECASE)
 
-        if not title and m:
-            title = m.group(1)
+        if not title and (m or text_mode):
+            if text_mode:
+                title = line
+            else:
+                title = m.group(1)
+
             crs.execute('INSERT INTO plays (title, url) VALUES (?, ?)',
                         (title, url))
             play_id = crs.lastrowid
@@ -108,6 +126,9 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
             continue
 
         # narrow to the body
+
+        if text_mode and not in_body and line == "--":
+            in_body = True
 
         if not in_body and title and re.match('^\<\/?center\>', line,
                                               re.IGNORECASE):
@@ -122,7 +143,10 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
 
         # extract the speaker and the phrase (for future formatting)
 
-        m = re.match(r'^\<b\>(.*?)\.?\<\/b\>\s*(\&nbsp\;)?(.*)', line)
+        if text_mode:
+            m = re.match(r'^(.*?)(:)\s*(.*)', line)
+        else:
+            m = re.match(r'^\<b\>(.*?)\.?\<\/b\>\s*(\&nbsp\;)?(.*)', line)
 
         if m:
             speaker = m.group(1)
@@ -131,6 +155,7 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         else:
             phrase = line
 
+            
         # clean up
 
         phrase = re.sub(r'\<\/?\S+?\>', '', phrase)
