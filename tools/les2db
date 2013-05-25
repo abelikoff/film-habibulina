@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 # parse HTML-formatted play into a DB
 
@@ -55,8 +56,7 @@ prog = os.path.basename(sys.argv[0])
 program_version = "1.0"
 version_string = "%%prog  %s" % program_version
 
-logging.basicConfig(format = "%(asctime)s  " + prog + 
-                    ": %(levelname)s: %(message)s")
+logging.basicConfig(format = prog + ": %(levelname)s: %(message)s")
 
 
 # parse command-line options
@@ -81,6 +81,8 @@ db_file, in_file, url = args
 
 conn = sqlite3.connect(db_file)
 crs = conn.cursor()
+num_speakers = 0
+num_records = 0
 
 with codecs.open(in_file, encoding = 'cp1251') as fin:
     title = None
@@ -92,18 +94,23 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
 
         # extract the title
 
-        m = re.match(r'^\<h2\>(.*?)\.?(\<(\/h2|br)\>)\s*', line)
+        m = re.match(r'^\<h2\>(.*?)\.?(\<(\/h2|br)\>)\s*', line, re.IGNORECASE)
 
         if not title and m:
             title = m.group(1)
             crs.execute('INSERT INTO plays (title, url) VALUES (?, ?)',
                         (title, url))
             play_id = crs.lastrowid
+
+            if options.verbose_mode:
+                logging.debug("title: '%s', play ID: %d" % (title, play_id))
+            
             continue
 
         # narrow to the body
 
-        if not in_body and title and re.match('^\<center\>', line):
+        if not in_body and title and re.match('^\<\/?center\>', line,
+                                              re.IGNORECASE):
             in_body = True
 
         if in_body and re.match('^\<hr', line):
@@ -120,6 +127,7 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         if m:
             speaker = m.group(1)
             phrase = m.group(3)
+            num_speakers += 1
         else:
             phrase = line
 
@@ -130,7 +138,7 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         phrase = re.sub(r'\<font[^\>]*\>', '', phrase)
         phrase = re.sub(r'\s+$', '', phrase)
 
-        if re.match('^\s*$', phrase):
+        if re.match('^\s*$', phrase) or phrase == u"Дійові особи":
             continue
 
         #if not speaker:
@@ -142,13 +150,21 @@ with codecs.open(in_file, encoding = 'cp1251') as fin:
         tokens = [ t for t in tokens if (not re.match(r'^\s*$', t)
                                          and len(t) > 1) ]
 
-        if len(tokens) == 0:
+        if len(tokens) < 2:
             continue
 
+        if options.verbose_mode:
+            if speaker:
+                logging.debug("%s: %s" % (speaker, phrase))
+            else:
+                logging.debug("%s" % phrase)
+        
+        num_records += 1
         crs.execute("""
 INSERT INTO quotes (play_id, speaker, phrase, tokens) VALUES (?,?,?,?)""",
                     (play_id, speaker, phrase, " ".join(tokens)))
 
 conn.commit()
 conn.close()
+print("%s  %d  %d" % (os.path.basename(in_file), num_records, num_speakers))
 sys.exit()
