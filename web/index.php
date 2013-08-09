@@ -2,19 +2,19 @@
 
   /*
     Copyright (C) 2013, Alexander L. Belikoff  ( http://belikoff.net )
-    
+
     This file is part of the project "Film Habibulina".
-    
+
     Film Habibulina is free software: you can redistribute it and/or
     modify it under the terms of the GNU General Public License as
     published by the Free Software Foundation, either version 3 of the
     License, or (at your option) any later version.
-    
+
     Film Habibulina is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
     General Public License for more details.
-    
+
     You should have received a copy of the GNU General Public License
     along with the project.  If not, see <http://www.gnu.org/licenses/>.
   */
@@ -52,7 +52,7 @@ function show_matches($query, $show_scores = FALSE)
 
 
     // load tokens
-    
+
     $phrases = array();
     $st = @$db->query("SELECT quote_id, tokens FROM quotes");
 
@@ -68,13 +68,13 @@ function show_matches($query, $show_scores = FALSE)
     $quote_ids = array();
     $scores = array();
     $ii = 0;
-    
+
     foreach ($phrases as $key => $value) {
         $ii++;
 
         if ($ii > 5 || $value['score'] < SCORE_CUTOFF)
             break;
-        
+
         array_push($quote_ids, $value['quote_id']);
         $scores[$value['quote_id']] = $value['score'];
     }
@@ -96,7 +96,7 @@ SELECT quote_id, title, url, speaker, phrase
         AND q.quote_id IN (" . implode(", ", $quote_ids) . ")");
 
     $results = array();
-    
+
     while ($row = $st->fetchArray()) {
         $results[$row['quote_id']] = $row;
     }
@@ -107,7 +107,7 @@ SELECT quote_id, title, url, speaker, phrase
 
         if ($speaker != "")
             $speaker .= ":";
-        
+
         printf('
       <div class="result-entry">
         <a class="source-link" href="%s" target="_blank">%s</a>
@@ -118,7 +118,7 @@ SELECT quote_id, title, url, speaker, phrase
 
         if ($show_scores)
             printf('<span class="score">%.5f</span>', $scores[$quote_id]);
-            
+
         printf('
       </div>
 ');
@@ -139,7 +139,7 @@ function get_similarity_score($phrase1, $phrase2)
         $phrase2 = array_map('trim', explode(" ", $phrase2));
 
     $score = 0;
-    
+
     foreach ($phrase1 as $w1) {
         $s = 0;
 
@@ -188,6 +188,7 @@ printf('
     <script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <!--script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
     <link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.1/css/bootstrap.min.css" rel="stylesheet" / -->
+
   </head>
   <body>
 
@@ -207,6 +208,20 @@ printf('
         </form>
       </div>
     </div> <!-- query-area -->
+
+      <div id="ad-area">
+        <script type="text/javascript"><!--
+          google_ad_client = "ca-pub-8336418173906555";
+          /* Govoritl.es Vertical */
+          google_ad_slot = "3555738975";
+          google_ad_width = 160;
+          google_ad_height = 600;
+          //-->
+        </script>
+        <script type="text/javascript"
+          src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+        </script>
+      </div>
 
 ',
        sprintf("http://%s%s", $_SERVER['HTTP_HOST'], $_SERVER['PHP_SELF']),
@@ -235,7 +250,7 @@ else {
       <div class="hint-title">Example queries</div>
       <ul>
 ');
-      
+
     foreach ($selected as $str) {
         $url = sprintf("http://%s%s?%s",
                        $_SERVER['HTTP_HOST'],
@@ -248,11 +263,12 @@ else {
 
 ', $url, $examples[$str]);
     }
-    
+
     printf('
 
       </ul>
     </div>   <!-- hint-area -->
+
 ');
 
 
@@ -260,11 +276,9 @@ else {
 
 printf('
 
-    </div>
-
     <footer>
       <hr />
-      <div id="credits">Текст произведений Леся: 
+      <div id="credits">Текст произведений Леся:
         <a href="http://www.doslidy.kiev.ua/" target="_blank">doslidy.kiev.ua</a>
       </div>
 
