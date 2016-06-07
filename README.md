@@ -12,31 +12,48 @@ and accesses the data via a read-only SQLite database.
 
 ## Search implementation
 
-Since we require fuzzy matching, searching is done by matching the
-query against _all_ phrases (properly cleaned up and tokenized) and
-selecting those with the highest _match score_.
+Since the corpus is relatively small and we require fuzzy matching,
+searching is done by matching the query against _all_ phrases
+(properly cleaned up and tokenized) and selecting those with the
+highest _match score_.
 
-At the bottom level, we use a concept of a _word match score_, which
-we define as follows:
+At the bottom level, we use a concept of a _word difference score_,
+which measures the difference between two words. We define it as
+follows:
 
-![equation](http://latex.codecogs.com/gif.latex?s%28w_1%2C%20w_2%29%20%3D%20e%5E%7B-r%20%5Cfrac%7BD%28w_1%2C%20w_2%29%7D%7B%5Cmax%7Bl%28w_1%29%2Cl%28w_2%29%7D%7D%7D)
+![equation](https://latex.codecogs.com/gif.latex?d%20%3D%20%5Cfrac%7BL%28w_1%2C%20w_2%29%7D%7B%5Cmax%28l_1%2Cl_2%29%7D)
 
-where _D_ is a Levenshtein word distance, _l(w)_ is a length of word
-_w_, and _r_ is a _rate_ parameter. When defined this way, score
-exhibits some desireable properties:
+where _L_ is a Levenshtein word distance, _l_ is a length of each
+word. The reason for scaling by the longer word length is to reflect
+the fact that for example, an edit distance of 2 between two 4-letter
+words is not the same as an edit distance of 2 in 15-letter ones.
 
-* The score value is between 0 and 1 (it is 1 when two words match).
-* It is relative to the size of both words (i.e. a single letter
-  mismatch for a two-letter words leads to a much lower score than a
-  single-letter mismatch for a ten-letter one).
-* There is a rate parameter affecting the impact of typos on the
-  score, which we can vary to find an optimal value.
+Defined this way, the difference score is a real number between 0 and
+1, where it is 0 for two identical words (or, strictly speaking, an
+insignificant difference between two infinite-length words).
 
+With this score defined, we calculate the phrase similarity score as
+follows:
 
-Having defined the words score, we define a score of macthing a query
-against oin of the tokenized phrases in the DB as a sum of maximum
-scores each query word can yield when macthed against each of the
-tokens within the phrase we are searching against.
+![equation](https://latex.codecogs.com/gif.latex?s%20%3D%20%5Cfrac%7B1%7D%7B1%20&plus;%20N_q%20&plus;%200.01%20*%20N_p%7D)
+
+where _Nq_ is number of _unmatched_ words in the query and _Np_ is
+number of _unmatched_ words in candidate quote. The rationale for such
+definition is given below:
+
+* The more unmatched words in the query the less good the match is,
+  since the user obvious considred those words important.
+
+* On the other hand, a candidate quote in most cases has many more
+  words than a query given (since the query will only have a handful
+  of most important words). Therefore we don't want the number of
+  unmatched words in the candidate quote to affect the score in a
+  major way. We use it scaled down by 100 to break a tie when two
+  quotes have a good match to query words. In this case a shorter
+  quote would score slightly higher.
+
+The similarity score defined this way is a real number from 0 to 1
+which is 1 for nearly exact match between two phrases.
 
 
 ## Source data
@@ -77,5 +94,3 @@ This step builds the database in _data/habib.db_.
 * Modify _web/config.php_ to reflect the location of the database
 file.
 * Deploy _web/config.php_, _web/index.php_, and _web/master.css_
-
-
