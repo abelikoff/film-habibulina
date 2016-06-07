@@ -23,7 +23,7 @@ follows:
 
 ![equation](https://latex.codecogs.com/gif.latex?d%20%3D%20%5Cfrac%7BL%28w_1%2C%20w_2%29%7D%7B%5Cmax%28l_1%2Cl_2%29%7D)
 
-where _L_ is a Levenshtein word distance, _l_ is a length of each
+where _L_ is Levenshtein edit distance and _l_ is length of each
 word. The reason for scaling by the longer word length is to reflect
 the fact that for example, an edit distance of 2 between two 4-letter
 words is not the same as an edit distance of 2 in 15-letter ones.
