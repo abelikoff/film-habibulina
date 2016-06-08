@@ -19,18 +19,12 @@
 
 
 body {
-    padding:50px 0px 0px 0px;
-    z-index:0;
+    padding: 50px 0px 0px 0px;
+    z-index: 0;
 }
 
 #query-form {
     margin-top: 30px;
-}
-
-#title-area {
-    margin-left:auto;
-    margin-right:auto;
-    text-align:center;
 }
 
 h1 {
@@ -60,27 +54,10 @@ h2 {
 }
 
 
-#input-area #zzquery-input {
-    background-color:#b0e0e6;
-    width: 50%;
-}
-
-#input-area .search-query {
-    width: 50%;
-}
-
 #results-area {
     margin-top: 60px;
-    zzfloat: right;
-    zzwidth: 80%;
-    zzclear: none;
 }
 
-#ad-area {
-    float: right;
-    width: 160px;
-    clear: none;
-}
 
 .result-entry {
     margin-bottom: 40px;
@@ -91,26 +68,15 @@ h2 {
     padding: 0px;
     margin-top: 2px;
     margin-right: 5%;
+    color: #545454;
 }
 
 
-.result-entry .score {
-    font-size: small;
-    color: #339933;
-}
-
-
-#bottom {
-    background: Blue;
-    float: left;
-    clear: bottom;
-}
-
-
-.source-link a, a:visited, a:link, a:hover {
+.source-link:visited, .source-link:link, .source-link:hover {
     font-size: larger;
     font-family: arial,sans-serif;
-    color: #12c;
+    text-decoration: none;
+    color: #1a0dab;
 }
 
 
@@ -119,13 +85,14 @@ h2 {
     text-decoration: none;
 }
 
+
 .speaker {
     font-weight: bold;
 }
 
 
 .credits {
-    font-size: smaller;
+    font-size: small;
 }
 
 
@@ -133,9 +100,19 @@ h2 {
     font-size: small;
 }
 
+
+.author a, .author a:visited, .author a:link, .author a:hover {
+    font-size: smaller;
+    font-family: arial,sans-serif;
+    text-decoration: none;
+    color: #b0b0b0;
+}
+
+
 #footer-content {
     padding-bottom: 20px;
 }
+
 
 .debug-stats {
     font-size: smaller;

@@ -27,6 +27,9 @@
 
     </head>
     <body>
+
+        {% if not devel %}
+
         <div id="fb-root"></div>
         <script>(function(d, s, id) {
              var js, fjs = d.getElementsByTagName(s)[0];
@@ -36,6 +39,8 @@
              fjs.parentNode.insertBefore(js, fjs);
          }(document, 'script', 'facebook-jssdk'));
         </script>
+
+        {% endif %}
 
         <div class="hidden-print hidden-xs">
             <a href="https://github.com/abelikoff/film-habibulina" target="_blank">
@@ -48,6 +53,7 @@
             <div class="row hidden-print visible-xs-block vilible-xs-inline"
                  id="ad-area-small" align="center">
                 <div class="col-xs-12">
+
                     {% if devel %}
 
                     <img src="https://placeholdit.imgix.net/~text?txtsize=33&txt=320%C3%97100&w=320&h=100"></img>
@@ -65,6 +71,7 @@
                     </script>
 
                     {% endif %}
+
                 </div>
             </div>
 
@@ -154,27 +161,43 @@
             <div class="container">
                 <hr />
                 <div class="row row-footer" id="footer-content">
-                    <div class="col-xs-12 col-sm-3 hidden-xs">
+                    <div class="col-xs-12 col-sm-8 hidden-xs">
                         <div class="credits" align="left">Текст произведений Леся:
-                            <a href="http://www.doslidy.kiev.ua/"
-                               target="_blank">doslidy.kiev.ua</a>
+                            <a href="http://doslidy.org.ua"
+                               target="_blank">doslidy.org.ua</a>
                         </div>
                     </div>
-                    <div class="col-xs-12 col-sm-6">
-                        <div class="hidden-print" align="center">
+
+                    <div class="col-xs-12 col-sm-4">
+
+                        {% if devel %}
+
+                        <div align="right">
+                            <img src="https://placeholdit.imgix.net/~text?w=155&h=45"/>
+                        </div>
+
+                        {% else %}
+
+                        <div class="hidden-print" align="right">
                             <div class="fb-like"
                                 data-href="http://govoritl.es"
                             data-layout="button_count" data-action="like"
                             data-show-faces="true" data-share="true"></div>
                         </div>
+
+                        {% endif %}
+
                     </div>
-                    <div class="col-xs-12 col-sm-3 hidden-xs">
-                        <div class="credits" align="right">Made by
+                </div>
+                <div class="row row-footer" id="footer-content">
+                    <div class="col-xs-12 col-sm-12 hidden-xs">
+                        <div align="center" class="author">
                             <a href="http://belikoff.net"
                                target="_blank">Alexander L. Belikoff</a>
                         </div>
                     </div>
                 </div>
+
             </div>
         </footer>
     </body>
