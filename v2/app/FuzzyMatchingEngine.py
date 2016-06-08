@@ -11,6 +11,7 @@ class SearchResult:
     def __init__(self):
         self.matches = []
         self.elapsed_time = None
+        self.total_matches = 0
 
 
 class Match:
@@ -68,6 +69,7 @@ class FuzzyMatchingEngine:
         sorted_qids = sorted(scores.items(), key=operator.itemgetter(1),
                              reverse=True)
         result = SearchResult()
+        result.total_matches = len(sorted_qids)
 
         for t in sorted_qids[:4]:
             q = self.__get_quote(t[0])

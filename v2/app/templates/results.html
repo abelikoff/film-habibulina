@@ -148,12 +148,13 @@
                 </div>
             </div>
 
+            {% if show_stats %}
             <div class="row" id="results-area">
                 <div class="col-xs-12 col-sm-6">
-                    <div class="debug-stats">12.324s, 145 matches</div>
+                    <div class="debug-stats">{{ "%.3fs, %d matches" % (result.elapsed_time, result.total_matches) }}</div>
                 </div>
             </div>
-
+            {% endif %}
 
         </div>
 
