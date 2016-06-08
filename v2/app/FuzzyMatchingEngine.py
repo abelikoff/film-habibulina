@@ -4,6 +4,7 @@
 import datetime
 import sqlite3
 import operator
+import sys
 from functools import lru_cache
 
 
@@ -21,6 +22,7 @@ class Match:
         self.quote = None
         self.url = None
         self.score = None
+        self.quote_id = None
 
 
 class FuzzyMatchingEngine:
@@ -78,7 +80,7 @@ class FuzzyMatchingEngine:
             m.actor = q['actor']
             m.quote = q['quote']
             m.url = q['url']
-            m.score = t[1]
+            m.quote_id, m.score = t
             result.matches.append(m)
 
         result.elapsed_time = (datetime.datetime.now() -
@@ -169,12 +171,26 @@ if __name__=='__main__':
         u"Шо мовчите, скуштували хуя"
     ]
 
+    if len(sys.argv) > 1:
+        queries = sys.argv[1:]
+
     for query in queries:
         result = engine.find_matches(query)
-        print("-" * 70)
-        print("QUERY: " + query)
-        print("%.3fs\n" % result.elapsed_time)
+        print("=" * 70)
+        print(query)
+        print("=" * 70)
+        print("%.3fs, %d matches\n" % (result.elapsed_time,
+                                       result.total_matches))
 
         for m in result.matches:
-            print("%s\n**%s**:  %s\n%.4f\n" % (m.play_name, m.actor,
-                m.quote, m.score))
+            if m.actor:
+                prefix = m.actor + ": "
+            else:
+                prefix = ""
+
+            print("%s\n%s\n%s%s\n%d  %.4f\n" % (m.play_name,
+                                            '-' * len(m.play_name),
+                                            prefix,
+                                            m.quote,
+                                            m.quote_id,
+                                            m.score))
