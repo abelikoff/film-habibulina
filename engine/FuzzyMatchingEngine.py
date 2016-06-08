@@ -1,15 +1,32 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+import datetime
 import sqlite3
 import operator
 from functools import lru_cache
 
 
+class SearchResult:
+    def __init__(self):
+        self.matches = []
+        self.elapsed_time = None
+
+
+class Match:
+    def __init__(self):
+        self.play_name = None
+        self.actor = None
+        self.quote = None
+        self.url = None
+        self.score = None
+
+
 class FuzzyMatchingEngine:
-    # Maximum allowed difference between two words
-    MAX_WORD_DIFF_RATE = 0.5
-    # Minimum allowed similarity score between two phrases
-    MIN_SIMILARITY_SCORE = 0.65
+    # Words with difference score less than this value are considered similar
+    WORD_SIMILARITY_THRESHOLD = 0.5
+    # Minimum similarity score for two phrases
+    PHRASE_SIMILARITY_THRESHOLD = 0.65
 
 
     def __init__(self):
@@ -38,25 +55,33 @@ class FuzzyMatchingEngine:
     def find_matches(self, query):
         "Find matches for a given query phrase."
 
+        start_time = datetime.datetime.now()
         words = query.lower().split()
         scores = {}
 
         for qid, tokens in self.all_tokens.items():
             s = self.__get_similarity_score(words, tokens)
 
-            if s >= FuzzyMatchingEngine.MIN_SIMILARITY_SCORE:
+            if s >= FuzzyMatchingEngine.PHRASE_SIMILARITY_THRESHOLD:
                 scores[qid] = s
 
         sorted_qids = sorted(scores.items(), key=operator.itemgetter(1),
                              reverse=True)
-        results = []
+        result = SearchResult()
 
         for t in sorted_qids[:4]:
             q = self.__get_quote(t[0])
-            q['score'] = t[1]
-            results.append(q)
+            m = Match()
+            m.play_name = q['play']
+            m.actor = q['actor']
+            m.quote = q['quote']
+            m.url = q['url']
+            m.score = t[1]
+            result.matches.append(m)
 
-        return results
+        result.elapsed_time = (datetime.datetime.now() -
+                               start_time).total_seconds()
+        return result
 
 
     def __get_quote(self, quote_id):
@@ -95,11 +120,11 @@ class FuzzyMatchingEngine:
                 dist = self.__levenshtein(w1, w2)
                 diff_rate = float(dist) / min(len(w1), len(w2))
 
-                if diff_rate < FuzzyMatchingEngine.MAX_WORD_DIFF_RATE:
+                if diff_rate < FuzzyMatchingEngine.WORD_SIMILARITY_THRESHOLD:
                     del unmatched1[w1]
                     del unmatched2[w2]
 
-        return 1.0 / (1 + len(unmatched1) + len(unmatched2) * 0.01)
+        return 1.0 / (1 + len(unmatched1) + len(unmatched2) * 0.001)
 
 
     @lru_cache(maxsize=1000000)
@@ -142,11 +167,11 @@ if __name__=='__main__':
     ]
 
     for query in queries:
+        result = engine.find_matches(query)
         print("-" * 70)
         print("QUERY: " + query)
-        print()
-        matches = engine.find_matches(query)
+        print("%.3fs\n" % result.elapsed_time)
 
-        for m in matches:
-            print("%s\n**%s**:  %s\n%.4f\n" % (m['play'], m['actor'],
-                m['quote'], m['score']))
+        for m in result.matches:
+            print("%s\n**%s**:  %s\n%.4f\n" % (m.play_name, m.actor,
+                m.quote, m.score))
