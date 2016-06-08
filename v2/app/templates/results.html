@@ -6,24 +6,28 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Фільм Хабібуліна</title>
 
-        <link href="http://fonts.googleapis.com/css?family=Roboto+Slab&subset=latin,cyrillic"
-              rel="stylesheet" type="text/css">
+        <link href='https://fonts.googleapis.com/css?family=Roboto+Slab|Bad+Script|Comfortaa:700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
               integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
               integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
-        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'style.css') }}" />
+        <link rel="stylesheet" type="text/css"
+              href="{{ url_for('static', filename = 'style.css') }}" />
+        <link rel="shortcut icon"
+              href="{{ url_for('static', filename='favicon.ico') }}">
 
+        {% if not devel %}
         <script>
          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
              (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
                                   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+         })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
          ga('create', 'UA-43025678-2', 'govoritl.es');
          ga('send', 'pageview');
 
         </script>
+        {% endif %}
 
     </head>
     <body>
@@ -75,10 +79,23 @@
                 </div>
             </div>
 
+            {% if result.status == "error" %}
+
+            <div class="row row-header">
+                <div class="col-xs-12 col-sm-4 col-sm-push-4">
+                    <div class="alert alert-danger" id="error-popup">
+                        <strong>[Ж] [О] [П] [А]</strong>
+                        (Всё сломалось).
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
             <div class="row row-header">
                 <div class="col-xs-12 col-sm-8 col-sm-push-2">
                     <p style="padding:20px;"></p>
-                    <a id="titleref" href="http://govoritl.es/index.php">
+                    <a id="titleref" href="{{ url_for('index') }}">
                         <h1 align="center">Фільм&nbsp;Хабібуліна</h1>
                     </a>
                     <h2 align="center">Цитатник&nbsp;Леся&nbsp;Подерв'янського</h2>
@@ -88,10 +105,12 @@
             <div class="row row-header">
                 <div class="col-xs-12 col-sm-8 col-sm-push-2">
                     <form id="query-form" class="form form-inline" role="form"
-                          align="center">
+                          align="center"
+                          method="get" action="{{ url_for('index') }}">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="query"
-                                   size="60" value="{{ query }}">
+                            <input type="text" class="form-control" name="q"
+                                   size="60" value="{{ result.org_query }}"
+                                   autofocus>
                         </div>
                         <button type="submit" class="btn btn-primary">
                             Поиск
@@ -100,14 +119,49 @@
                 </div>
             </div>
 
+            {% if result.status == "default" %}
+
+            <div class="row row-header">
+                <div class="col-xs-12 col-sm-4 col-sm-push-4">
+
+                    {% for ex in examples %}
+
+                    <p align="center">
+                        <a href="{{ url_for('index', q = ex) }}">{{ ex }}</a></p>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+
+            {% elif result.status == "no matches" %}
+
+            <div class="row row-header">
+                <div class="col-xs-12 col-sm-4 col-sm-push-4">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Нічого немає</strong>, сто гарпунів киту в сраку!
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
+
             <div class="row" id="results-area">
                 <div class="col-xs-12 col-sm-10">
+
+                    {% if result.status == "matches" %}
 
                     {% for m in result.matches %}
 
                     <div class="result-entry">
                         <a class="source-link" href="{{ m.url }}" target="_blank">{{ m.play_name }}</a>
-                        <div class="quote"><span class="speaker">{{ m.actor }}:</span>
+
+                        <div class="quote">
+                            {% if m.actor %}
+                            <span class="speaker">{{ m.actor }}:</span>
+                            {% endif %}
+
                             {{ m.quote }}
                         </div>
 
@@ -120,6 +174,8 @@
                     </div>
 
                     {% endfor %}
+
+                    {% endif %}
 
                 </div>
 
@@ -181,7 +237,7 @@
 
                         <div class="hidden-print" align="right">
                             <div class="fb-like"
-                                data-href="http://govoritl.es"
+                                 data-href="{{ url_for('index') }}"
                             data-layout="button_count" data-action="like"
                             data-show-faces="true" data-share="true"></div>
                         </div>

@@ -10,9 +10,13 @@ from functools import lru_cache
 
 class SearchResult:
     def __init__(self):
+        self.org_query = ""               # original (unclean) query string
+        self.query = ""                   # cleaned up query string
+        self.status = "default"           # default, matches, no matches, error
         self.matches = []
         self.elapsed_time = None
         self.total_matches = 0
+        self.error = None
 
 
 class Match:
@@ -27,7 +31,7 @@ class Match:
 
 class FuzzyMatchingEngine:
     # Words with difference score less than this value are considered similar
-    WORD_SIMILARITY_THRESHOLD = 0.5
+    WORD_SIMILARITY_THRESHOLD = 0.35
     # Minimum similarity score for two phrases
     PHRASE_SIMILARITY_THRESHOLD = 0.65
 
@@ -35,16 +39,36 @@ class FuzzyMatchingEngine:
     def __init__(self):
         self.all_tokens = {}
         self.db_conn = None
+        self.last_error = None
 
 
     def open_db(self, db_file):
         "Open quotes database."
 
-        self.db_conn = sqlite3.connect(db_file, uri=True)
+        try:
+            self.db_conn = sqlite3.connect("file:%s?mode=ro" % db_file,
+                                            uri=True)
+        except Exception as ex:
+            self.db_conn = None
+            print("FIXME: DB open failed: " + str(ex))
+            self.last_error = str(ex)
+
+
+    def close_db(self):
+        "Close database."
+
+        if not self.db_conn:
+            return
+
+        self.db_conn.close()
+        self.db_conn = None
 
 
     def load_tokens(self):
         "Load quote tokens."
+
+        if not self.db_conn:
+            return
 
         c = self.db_conn.cursor()
         self.all_tokens = {}
@@ -58,6 +82,14 @@ class FuzzyMatchingEngine:
     def find_matches(self, query):
         "Find matches for a given query phrase."
 
+        result = SearchResult()
+        result.query = query
+
+        if not self.db_conn:
+            result.status = "error"
+            result.error = "Database not open (" + self.last_error + ")"
+            return result
+
         start_time = datetime.datetime.now()
         words = query.lower().split()
         scores = {}
@@ -70,8 +102,8 @@ class FuzzyMatchingEngine:
 
         sorted_qids = sorted(scores.items(), key=operator.itemgetter(1),
                              reverse=True)
-        result = SearchResult()
         result.total_matches = len(sorted_qids)
+        result.status = "no matches"
 
         for t in sorted_qids[:4]:
             q = self.__get_quote(t[0])
@@ -82,6 +114,7 @@ class FuzzyMatchingEngine:
             m.url = q['url']
             m.quote_id, m.score = t
             result.matches.append(m)
+            result.status = "matches"
 
         result.elapsed_time = (datetime.datetime.now() -
                                start_time).total_seconds()
@@ -122,7 +155,7 @@ class FuzzyMatchingEngine:
                     continue
 
                 dist = self.__levenshtein(w1, w2)
-                diff_rate = float(dist) / min(len(w1), len(w2))
+                diff_rate = float(dist) / max(len(w1), len(w2))
 
                 if diff_rate < FuzzyMatchingEngine.WORD_SIMILARITY_THRESHOLD:
                     del unmatched1[w1]
@@ -158,7 +191,7 @@ class FuzzyMatchingEngine:
         return previous_row[-1]
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     engine = FuzzyMatchingEngine()
     engine.open_db("habib.db")
     engine.load_tokens()

@@ -1,44 +1,100 @@
-from flask import Flask, render_template
+# -*- coding: utf-8 -*-
+
+import os
+import string
+from flask import Flask, render_template, current_app, request
 from app import FuzzyMatchingEngine
 
 app = Flask(__name__)
 
 
-@app.route('/')
+# load configuration
+
+if os.getenv('LES_CONFIG'):
+    app.config.from_envvar('LES_CONFIG')
+else:
+    app.config.from_pyfile('app.cfg')
+
+devel_mode = 'DEVELOPMENT_MODE' in app.config
+
+
+# all requests are done via the default route/URL by passing the query
+# in the 'q' parameter
+
+@app.route('/', methods=['GET', 'POST'])
 def index():
-    #current_app['foo'] = "jkdhgkjdd"
+    org_query = request.args.get('q')
+    show_stats = request.args.get('stats')
+    result = FuzzyMatchingEngine.SearchResult()
 
-    engine = FuzzyMatchingEngine.FuzzyMatchingEngine()
-    engine.open_db("./app/habib.db")
-    engine.load_tokens()
-    query = u"дослідники калу"
-    matches = engine.find_matches(query)
+    if devel_mode:
+        print("*** Query is: '%s'" % org_query)
 
-    for m in matches:
-        print("%s\n**%s**:  %s\n%.4f\n" % (m['play'], m['actor'],
-                                           m['quote'], m['score']))
+    query = prepare_query(org_query)
+
+    if query:
+        engine = get_engine()
+        result = engine.find_matches(query)
+        result.org_query = org_query
+
+    examples = [
+        "чого вам не хвата, тюрми?",
+        "А ти хуй в бєлки видів?",
+        "Шо мовчите, скуштували хуя?"
+    ]
+
+    return render_template('results.html', result=result, examples=examples,
+                           show_stats=show_stats, devel=devel_mode)
 
 
-    return render_template('default.html')
+def prepare_query(query):
+    """Clean up query string.
+
+    We delete all punctuation and single-character words.
+    """
+
+    if not query:
+        return None
+
+    translator = get_translator()
+    new_query = query.translate(translator).strip()
+    new_query = ' '.join([w for w in new_query.split() if len(w) > 1])
+
+    if (query != new_query) and devel_mode:
+        print("*** Stripped query is: '%s'" % new_query)
+
+    return new_query
 
 
-@app.route('/<query>')
-def run_query(query):
-    #current_app['foo'] = "jkdhgkjdd"
+def get_engine():
+    "Build the engine object and load the data."
 
-    engine = FuzzyMatchingEngine.FuzzyMatchingEngine()
-    engine.open_db("./app/habib.db")
-    engine.load_tokens()
-    #query = u"дослідники калу"
-    result = engine.find_matches(query)
+    engine = getattr(current_app, '_engine', None)
 
-    print("%.3fs\n" % result.elapsed_time)
+    if engine is None:
+        if devel_mode:
+            print("*** Loading the search engine")
 
-    for m in result.matches:
-        print("%s\n**%s**:  %s\n%.4f\n" % (m.play_name, m.actor,
-                                           m.quote, m.score))
+        engine = current_app._engine = FuzzyMatchingEngine.FuzzyMatchingEngine()
+        engine.open_db(app.config['DB_FILE'])
+        engine.load_tokens()
 
-    return render_template('results.html', query=query, result=result, devel=True)
+    return engine
+
+
+def get_translator():
+    "Build the character translator for punctuation removal."
+
+    translator = getattr(current_app, '_translator', None)
+
+    if translator is None:
+        if devel_mode:
+            print("*** Setting up the translator")
+
+        translator = current_app._translator = \
+            str.maketrans({key: None for key in string.punctuation})
+
+    return translator
 
 
 if __name__ == '__main__':

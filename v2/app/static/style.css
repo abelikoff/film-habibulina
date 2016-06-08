@@ -28,11 +28,12 @@ body {
 }
 
 h1 {
-    font-family: 'Roboto Slab', serif;
+    /*font-family: 'Roboto Slab', serif;*/
+    font-family: 'Comfortaa', cursive;
 }
 
 h2 {
-    font-family: 'Roboto Slab', serif;
+    font-family: 'Bad Script', cursive;
     font-size: 16px;
     margin-top: 10px;
     margin-bottom: 10px;
@@ -44,7 +45,7 @@ h2 {
     }
 
     h2 {
-        font-size: 20px;
+        font-size: 24px;
     }
 
     #query-form {
