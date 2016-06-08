@@ -1,0 +1,144 @@
+/*
+  Copyright (C) 2013, Alexander L. Belikoff  ( http://belikoff.net )
+
+  This file is part of the project "Film Habibulina".
+
+  Film Habibulina is free software: you can redistribute it and/or
+  modify it under the terms of the GNU General Public License as
+  published by the Free Software Foundation, either version 3 of the
+  License, or (at your option) any later version.
+
+  Film Habibulina is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with the project.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+body {
+    padding:50px 0px 0px 0px;
+    z-index:0;
+}
+
+#query-form {
+    margin-top: 30px;
+}
+
+#title-area {
+    margin-left:auto;
+    margin-right:auto;
+    text-align:center;
+}
+
+h1 {
+    font-family: 'Roboto Slab', serif;
+}
+
+h2 {
+    font-family: 'Roboto Slab', serif;
+    font-size: 16px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 800px) {
+    h1 {
+        font-size: 60px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    #query-form {
+        margin-top: 60px;
+        margin-bottom: 50px;
+    }
+}
+
+
+#input-area #zzquery-input {
+    background-color:#b0e0e6;
+    width: 50%;
+}
+
+#input-area .search-query {
+    width: 50%;
+}
+
+#results-area {
+    margin-top: 60px;
+    zzfloat: right;
+    zzwidth: 80%;
+    zzclear: none;
+}
+
+#ad-area {
+    float: right;
+    width: 160px;
+    clear: none;
+}
+
+.result-entry {
+    margin-bottom: 40px;
+}
+
+
+.result-entry .quote {
+    padding: 0px;
+    margin-top: 2px;
+    margin-right: 5%;
+}
+
+
+.result-entry .score {
+    font-size: small;
+    color: #339933;
+}
+
+
+#bottom {
+    background: Blue;
+    float: left;
+    clear: bottom;
+}
+
+
+.source-link a, a:visited, a:link, a:hover {
+    font-size: larger;
+    font-family: arial,sans-serif;
+    color: #12c;
+}
+
+
+#titleref {
+    color: #333333;
+    text-decoration: none;
+}
+
+.speaker {
+    font-weight: bold;
+}
+
+
+.credits {
+    font-size: smaller;
+}
+
+
+.credits a {
+    font-size: small;
+}
+
+#footer-content {
+    padding-bottom: 20px;
+}
+
+.debug-stats {
+    font-size: smaller;
+    font-style: italic;
+    color: #339933;
+}
