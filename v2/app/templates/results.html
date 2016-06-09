@@ -126,7 +126,7 @@
             <div class="row row-header" id="examples">
                 <div class="col-xs-12 col-sm-4 col-sm-push-4">
 
-                    {% for ex in examples %}
+                    {% for ex in aux_data['example_queries'] %}
 
                     <p align="center" class="example">
                         <a href="{{ url_for('index', q = ex) }}">{{ ex }}</a></p>
@@ -138,10 +138,11 @@
 
             {% elif result.status == "no matches" %}
 
-            <div class="row row-header">
+            <div class="row row-header" id="no-results-alert">
                 <div class="col-xs-12 col-sm-4 col-sm-push-4">
                     <div class="alert alert-warning" role="alert">
-                        <strong>Нічого немає</strong>, сто гарпунів киту в сраку!
+                        <strong>Нічого немає</strong>,
+                        {{ aux_data['not_found_message'] }}
                     </div>
                 </div>
             </div>

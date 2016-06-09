@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
 import string
 from flask import Flask, render_template, current_app, request
 from app import FuzzyMatchingEngine
@@ -38,14 +39,30 @@ def index():
         result = engine.find_matches(query)
         result.org_query = org_query
 
-    examples = [
-        "чого вам не хвата, тюрми?",
-        "А ти хуй в бєлки видів?",
-        "Шо мовчите, скуштували хуя?"
-    ]
+    aux_data = get_aux_data()
 
-    return render_template('results.html', result=result, examples=examples,
+    return render_template('results.html', result=result, aux_data=aux_data,
                            show_stats=show_stats, devel=devel_mode)
+
+
+@app.route('/<path:path>')
+def static_proxy(path):
+    "Allow serving any assets in the static directory."
+
+    return app.send_static_file(path)
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    "Show a 'not found' message."
+
+    result = FuzzyMatchingEngine.SearchResult()
+    result.org_query = ''
+    result.status = 'no matches'
+    aux_data = get_aux_data()
+
+    return render_template('results.html', result=result, aux_data=aux_data,
+                           show_stats=False, devel=devel_mode), 404
 
 
 def prepare_query(query):
@@ -65,6 +82,46 @@ def prepare_query(query):
         print("*** Stripped query is: '%s'" % new_query)
 
     return new_query
+
+
+def get_aux_data():
+    """Build various auxilliary data.
+    """
+
+    aux_data = { 'example_queries': [], 'not_found_message': '' }
+
+    examples = [
+        "чого вам не хвата, тюрми?",
+        "А ти хуй в бєлки видів?",
+        "Шо мовчите, скуштували хуя?",
+        "Йобане село!",
+        "Так би усє кишки у тєбя і шваpкнули",
+        "Я етого не люблю",
+        "Дєтство Геббельса",
+        "Молодой, культурний чєловєк бьйот кота"
+    ]
+
+    error_messages = [
+        "сто чортів жабі в цицьку!",
+        "сто гарпунів киту в сраку!",
+        "сто п’яних кашалотів в твою мать!",
+        "сто центнерів простіпоми тобі в сурло!",
+        "сто чортів твоєму батькові!",
+        "о найприємніший з приємних!"
+    ]
+
+    if not getattr(current_app, '_rng', None):
+        random.seed()
+        current_app._rng = True
+
+    selected = random.sample(range(len(examples)), 3)
+
+    for ii in selected:
+        aux_data['example_queries'].append(examples[ii])
+
+    n = random.randint(0, len(error_messages) - 1)
+    aux_data['not_found_message'] = error_messages[n]
+    return aux_data
 
 
 def get_engine():
