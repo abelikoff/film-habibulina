@@ -39,6 +39,15 @@ h2 {
     margin-bottom: 10px;
 }
 
+#results-area {
+    margin-top: 50px;
+}
+
+.result-entry {
+    margin-bottom: 30px;
+}
+
+
 @media (min-width: 800px) {
     h1 {
         font-size: 60px;
@@ -52,16 +61,26 @@ h2 {
         margin-top: 60px;
         margin-bottom: 50px;
     }
+
+    #results-area {
+        margin-top: 60px;
+    }
+
+    .result-entry {
+        margin-bottom: 40px;
+    }
+
+    #query-input {
+        width: 400px;
+    }
 }
 
 
-#results-area {
-    margin-top: 60px;
-}
+@media (max-width: 800px) {
+    #examples {
+        margin-top: 40px;
+    }
 
-
-.result-entry {
-    margin-bottom: 40px;
 }
 
 

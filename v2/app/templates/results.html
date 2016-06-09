@@ -108,8 +108,10 @@
                           align="center"
                           method="get" action="{{ url_for('index') }}">
                         <div class="form-group">
-                            <input type="text" class="form-control" name="q"
-                                   size="60" value="{{ result.org_query }}"
+                            <input type="text" class="form-control"
+                                   id="query-input"
+                                   name="q"
+                                   value="{{ result.org_query }}"
                                    autofocus>
                         </div>
                         <button type="submit" class="btn btn-primary">
@@ -121,12 +123,12 @@
 
             {% if result.status == "default" %}
 
-            <div class="row row-header">
+            <div class="row row-header" id="examples">
                 <div class="col-xs-12 col-sm-4 col-sm-push-4">
 
                     {% for ex in examples %}
 
-                    <p align="center">
+                    <p align="center" class="example">
                         <a href="{{ url_for('index', q = ex) }}">{{ ex }}</a></p>
 
                     {% endfor %}
