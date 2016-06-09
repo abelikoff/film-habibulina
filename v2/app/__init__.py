@@ -16,6 +16,7 @@ else:
     app.config.from_pyfile('app.cfg')
 
 devel_mode = 'DEVELOPMENT_MODE' in app.config
+share_sqlite = 'SHARE_SQLITE_CONN' in app.config
 
 
 # all requests are done via the default route/URL by passing the query
@@ -69,15 +70,21 @@ def prepare_query(query):
 def get_engine():
     "Build the engine object and load the data."
 
-    engine = getattr(current_app, '_engine', None)
+    if share_sqlite:
+        engine = getattr(current_app, '_engine', None)
 
-    if engine is None:
-        if devel_mode:
-            print("*** Loading the search engine")
+        if engine:
+            return engine
 
-        engine = current_app._engine = FuzzyMatchingEngine.FuzzyMatchingEngine()
-        engine.open_db(app.config['DB_FILE'])
-        engine.load_tokens()
+    if devel_mode:
+        print("*** Loading the search engine")
+
+    engine = FuzzyMatchingEngine.FuzzyMatchingEngine()
+    engine.open_db(app.config['DB_FILE'])
+    engine.load_tokens()
+
+    if share_sqlite:
+        current_app._engine = engine
 
     return engine
 
