@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import editdistance
 import sqlite3
 import operator
 import sys
@@ -154,7 +155,7 @@ class FuzzyMatchingEngine:
                 if (not w1 in unmatched1) or (not w2 in unmatched2):
                     continue
 
-                dist = self.__levenshtein(w1, w2)
+                dist = editdistance.eval(w1, w2)
                 diff_rate = float(dist) / max(len(w1), len(w2))
 
                 if diff_rate < FuzzyMatchingEngine.WORD_SIMILARITY_THRESHOLD:
@@ -162,33 +163,6 @@ class FuzzyMatchingEngine:
                     del unmatched2[w2]
 
         return 1.0 / (1 + len(unmatched1) + len(unmatched2) * 0.001)
-
-
-    @lru_cache(maxsize=1000000)
-    def __levenshtein(self, s1, s2):
-        "Levenshtein distance (from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Python)"
-
-        if s1 == s2:
-            return 0
-
-        if len(s1) < len(s2):
-            return self.__levenshtein(s2, s1)
-
-        # len(s1) >= len(s2)
-        if len(s2) == 0:
-            return len(s1)
-
-        previous_row = range(len(s2) + 1)
-        for i, c1 in enumerate(s1):
-            current_row = [i + 1]
-            for j, c2 in enumerate(s2):
-                insertions = previous_row[j + 1] + 1 # j+1 instead of j since previous_row and current_row are one character longer
-                deletions = current_row[j] + 1       # than s2
-                substitutions = previous_row[j] + (c1 != c2)
-                current_row.append(min(insertions, deletions, substitutions))
-            previous_row = current_row
-
-        return previous_row[-1]
 
 
 if __name__ == '__main__':
