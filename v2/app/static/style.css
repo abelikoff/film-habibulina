@@ -19,7 +19,7 @@
 
 
 body {
-    padding: 50px 0px 0px 0px;
+    padding: 10px 0px 0px 0px;
     z-index: 0;
 }
 
@@ -28,7 +28,6 @@ body {
 }
 
 h1 {
-    /*font-family: 'Roboto Slab', serif;*/
     font-family: 'Comfortaa', cursive;
 }
 
@@ -92,13 +91,14 @@ h2 {
     padding: 0px;
     margin-top: 2px;
     margin-right: 5%;
+    font-family: 'Roboto',arial,sans-serif;
     color: #545454;
 }
 
 
 .source-link:visited, .source-link:link, .source-link:hover {
     font-size: larger;
-    font-family: arial,sans-serif;
+    font-family: 'Roboto',arial,sans-serif;
     text-decoration: none;
     color: #1a0dab;
 }
@@ -130,6 +130,11 @@ h2 {
     font-family: arial,sans-serif;
     text-decoration: none;
     color: #b0b0b0;
+}
+
+
+#ad-area {
+    margin-bottom: 50px;
 }
 
 

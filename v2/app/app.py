@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-import FuzzyMatchingEngine
 import os
 import random
 import string
@@ -9,6 +8,7 @@ import sys
 from flask import Flask, render_template, current_app, request
 
 sys.path.append("/var/www/html/govoritl.es/app")
+import FuzzyMatchingEngine
 
 
 app = Flask(__name__)
@@ -118,6 +118,11 @@ def get_aux_data():
         "Я етого не люблю",
         "Дєтство Геббельса",
         "Молодой, культурний чєловєк бьйот кота",
+        "білочка, ворог лісів",
+        "Чурка йобаний, чєрєз мінуту віжу борш на столє",
+        "От, жалко пацана",
+        "Швецію зробимо",
+        "Поїдемо в кафе Ластівка, приєбемося до армян і пизди дамо",
     ]
 
     error_messages = [

@@ -6,6 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>Фільм Хабібуліна</title>
 
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
         <link href='https://fonts.googleapis.com/css?family=Roboto+Slab|Bad+Script|Comfortaa:700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
               integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
@@ -54,22 +55,23 @@
         </div>
 
         <div class="container">
-            <div class="row hidden-print visible-xs-block vilible-xs-inline"
-                 id="ad-area-small" align="center">
+            <div class="row hidden-print" id="ad-area" align="center">
                 <div class="col-xs-12">
 
                     {% if devel %}
 
-                    <img src="https://placeholdit.imgix.net/~text?txtsize=33&txt=320%C3%97100&w=320&h=100"></img>
+                    <img src="https://via.placeholder.com/600x100/FFFF00/000000?text=Dummy large"></img>
 
                     {% else %}
 
                     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                    <!-- Govoritl.es small banner -->
+                    <!-- Govoritl.es top responsive banner -->
                     <ins class="adsbygoogle"
-                         style="display:inline-block;width:320px;height:100px"
+                         style="display:block"
                          data-ad-client="ca-pub-8336418173906555"
-                         data-ad-slot="9877547774"></ins>
+                         data-ad-slot="8599637411"
+                         data-ad-format="auto"
+                         data-full-width-responsive="true"></ins>
                     <script>
                      (adsbygoogle = window.adsbygoogle || []).push({});
                     </script>
@@ -94,7 +96,6 @@
 
             <div class="row row-header">
                 <div class="col-xs-12 col-sm-8 col-sm-push-2">
-                    <p style="padding:20px;"></p>
                     <a id="titleref" href="{{ url_for('index') }}">
                         <h1 align="center">Фільм&nbsp;Хабібуліна</h1>
                     </a>
@@ -180,30 +181,6 @@
 
                     {% endif %}
 
-                </div>
-
-                <div class="col-xs-12 col-sm-2">
-                    <div id="ad-area" class="hidden-print hidden-xs">
-                        {% if devel %}
-
-                        <img src="https://placeholdit.imgix.net/~text?txtsize=33&txt=160%C3%97600&w=160&h=600"></img>
-
-                        {% else %}
-
-                        <script async
-                                src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                        <!-- Govoritl.es Vertical -->
-                        <ins class="adsbygoogle"
-                             style="display:inline-block;width:160px;height:600px"
-                             data-ad-client="ca-pub-8336418173906555"
-                             data-ad-slot="3555738975"></ins>
-                        <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                        </script>
-
-                        {% endif %}
-
-                    </div>
                 </div>
             </div>
 
