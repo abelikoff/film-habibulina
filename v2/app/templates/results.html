@@ -46,7 +46,7 @@
 
         {% endif %}
 
-        <div class="hidden-print hidden-xs">
+        <div class="hidden-print hidden-xs" style="position: absolute; top: 0; left: 0; border: 0;">
             <a href="https://github.com/abelikoff/film-habibulina">
                 <img decoding="async" loading="lazy" width="149" height="149"
                     src="https://github.blog/wp-content/uploads/2008/12/forkme_left_green_007200.png?resize=149%2C149"
@@ -215,12 +215,16 @@
 
                         {% else %}
 
-                        <div class="hidden-print" align="right">
-                            <div class="fb-like"
-                                 data-href="{{ url_for('index') }}"
-                            data-layout="button_count" data-action="like"
-                            data-show-faces="true" data-share="true"></div>
+                        <!-- AddToAny BEGIN -->
+                        <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+                        <a class="a2a_dd" href="https://www.addtoany.com/share"></a>
+                        <a class="a2a_button_twitter"></a>
+                        <a class="a2a_button_facebook"></a>
+                        <a class="a2a_button_telegram"></a>
+                        <a class="a2a_button_reddit"></a>
                         </div>
+                        <script async src="https://static.addtoany.com/menu/page.js"></script>
+                        <!-- AddToAny END -->
 
                         {% endif %}
 
