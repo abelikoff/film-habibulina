@@ -16,6 +16,8 @@
               href="{{ url_for('static', filename = 'style.css') }}" />
         <link rel="shortcut icon"
               href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="canonical"
+              href="{{ request.url | replace('www.', '', 1) }}">
 
         {% if not devel %}
         <!-- Google tag (gtag.js) -->
