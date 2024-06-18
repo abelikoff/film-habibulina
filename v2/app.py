@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 
-
 import os
 import random
 import string
-import sys
 from flask import Flask, render_template, current_app, request
 
-sys.path.append("/var/www/html/govoritl.es/app")
 import FuzzyMatchingEngine
 
 
