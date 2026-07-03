@@ -53,6 +53,14 @@ def index():
     )
 
 
+@app.route('/ads.txt')
+def serve_ads_txt():
+    """
+    Serve /ads.txt from the 'static' directory.
+    """
+    return send_from_directory(app.static_folder, 'ads.txt')
+
+
 @app.route("/<path:path>")
 def static_proxy(path):
     "Allow serving any assets in the static directory."
