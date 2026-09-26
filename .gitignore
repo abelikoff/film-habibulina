@@ -1,6 +1,5 @@
 *~
-data/habib.db
-web/config.php
+ads.txt
 *.py[cod]
 
 # C extensions
