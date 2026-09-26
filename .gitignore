@@ -36,6 +36,3 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-
-v2/app/app.cfg
-
