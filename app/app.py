@@ -3,7 +3,7 @@
 import os
 import random
 import string
-from flask import Flask, render_template, current_app, request
+from flask import Flask, render_template, current_app, request, send_from_directory
 
 import FuzzyMatchingEngine
 
@@ -56,7 +56,7 @@ def index():
 @app.route('/ads.txt')
 def serve_ads_txt():
     """
-    Serve /ads.txt from the 'static' directory.
+    Serve /ads.txt from the static directory.
     """
     return send_from_directory(app.static_folder, 'ads.txt')
 

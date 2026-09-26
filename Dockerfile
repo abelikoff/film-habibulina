@@ -8,6 +8,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code and data
 COPY app .
+COPY ads.txt static/ads.txt
 COPY data/habib.db /data/habib.db
 
 # Run as www-data
